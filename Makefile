@@ -16,9 +16,15 @@ build: regarding/__about__.py setup.py
 
 regarding/__about__.py: pyproject.toml
 	python -m regarding -o $@
+	# Run again for bootstrapping new values
+	python -m regarding -o $@
 
 setup.py: pyproject.toml poetry.lock
 	dephell deps convert --from pyproject.toml --to setup.py
+
+# Note, this clean rule is NOT to be called as part of `clean`
+clean-autogen:
+	rm regarding/__about__.py setup.py
 
 
 ## Clean
@@ -34,6 +40,7 @@ test-all:
 	tox --parallel=all -- $(PYTEST_ARGS)
 
 test-dist: dist
+	poetry check
 	@for f in `find dist -type f -name ${PROJECT_NAME}-${VERSION}.tar.gz \
               -o -name \*.egg -o -name \*.whl`; do \
 		twine check $$f ; \
@@ -92,7 +99,7 @@ install-dev: build
 ## Release
 release: pre-release _freeze-release test-all dist _tag-release _pypi-release
 
-pre-release: build install-dev info check-version-tag clean \
+pre-release: clean-autogen build install-dev info check-version-tag clean \
              test test-dist check-manifest authors  # changelog
 
 BUMP ?= prerelease

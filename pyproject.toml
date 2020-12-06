@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "regarding"
-version = "0.1.1"
+version = "0.1.2"
 description = "Create __about__.py files from `pyproject.toml`."
 readme = "README.rst"
 authors = ["Travis Shirk <travis@pobox.com>"]
