@@ -1,11 +1,3 @@
-all: build test  ## Build and test
-
-help: ## List all commands
-	@# This code borrowed from https://github.com/jedie/poetry-publish/blob/master/Makefile
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-
-
-## Data
 PYTEST_ARGS ?=
 PYPI_REPO ?= pypi
 
@@ -13,9 +5,16 @@ PROJECT_NAME = $(shell python ./setup.py --name 2> /dev/null)
 VERSION = $(shell python ./setup.py --version 2> /dev/null)
 RELEASE_NAME = $(shell python ./setup.py --release-name 2> /dev/null)
 RELEASE_TAG = v$(VERSION)
+ABOUT_PY = regarding/__about__.py
+
+all: build test  ## Build and test
 
 
 # Meta
+help: ## List all commands
+	@# This code borrowed from https://github.com/jedie/poetry-publish/blob/master/Makefile
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
 info:  ## Show project metadata
 	@echo "VERSION: $(VERSION)"
 	@echo "RELEASE_TAG: $(RELEASE_TAG)"
@@ -24,9 +23,10 @@ info:  ## Show project metadata
 
 
 ## Build
-build: regarding/__about__.py setup.py  ## Build the project
+.PHONY: build
+build: $(ABOUT_PY) setup.py  ## Build the project
 
-regarding/__about__.py: pyproject.toml
+$(ABOUT_PY): pyproject.toml
 	python -m regarding -o $@
 	# Run again for bootstrapping new values
 	python -m regarding -o $@
@@ -36,12 +36,13 @@ setup.py: pyproject.toml poetry.lock
 
 # Note, this clean rule is NOT to be called as part of `clean`
 clean-autogen:
-	rm regarding/__about__.py setup.py
+	-rm $(ABOUT_PY) setup.py
 
 
 ## Clean
 clean: clean-test clean-dist  ## Clean the project
-	rm -rf regarding.egg-info regarding/__pycache__
+	rm -rf regarding.egg-info
+	find -type d -name __pycache__ | xargs -r rm -rf
 
 
 ## Test
@@ -62,7 +63,8 @@ lint:  ## Check coding style
 	tox -e lint
 
 clean-test:  ## Clean test artifacts (included in `clean`)
-	rm -rf tests/__pycache__ .pytest_cache .tox
+	rm -rf .tox
+	rm -rf tests/__pycache__ .pytest_cache
 
 
 ## Distribute
@@ -75,7 +77,7 @@ bdist: build
 .PHONY: dist
 dist: clean sdist bdist  ## Create source and binary distribution files
 	@# The cd dist keeps the dist/ prefix out of the md5sum files
-	cd dist && \
+	@cd dist && \
 	for f in $$(ls); do \
 		md5sum $${f} > $${f}.md5; \
 	done
@@ -95,6 +97,7 @@ _check-version-tag:
     fi
 
 authors:
+	dephell generate authors
 
 _pypi-release:
 	poetry publish -r ${PYPI_REPO}
@@ -112,7 +115,7 @@ install-dev: build  ## Install projec, dependencies, and developer tools
 release: pre-release _freeze-release test-all dist _tag-release _pypi-release
 
 pre-release: clean-autogen build install-dev info _check-version-tag clean \
-             test test-dist check-manifest authors  # changelog
+             test test-dist check-manifest authors changelog
 
 BUMP ?= prerelease
 bump-release: requirements
@@ -133,3 +136,6 @@ _freeze-release:
 _tag-release:
 	git tag -a $(RELEASE_TAG) -m "Release $(RELEASE_TAG)"
 	git push --tags origin
+
+changelog:
+	@echo "FIXME: changelog target not yet implemented"
