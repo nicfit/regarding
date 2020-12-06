@@ -8,31 +8,32 @@ from collections import namedtuple
 
 class ProjectToml:
     def __init__(self):
-        self.project_toml = toml.loads(Path("pyproject.toml").read_text())
-        self.project = self.project_toml["tool"]["poetry"]
-        self._version, self._version_info = self.parseVersion(self.project["version"])
+        project_toml = toml.loads(Path("pyproject.toml").read_text())
+        self._poetry = project_toml["tool"]["poetry"]
+        self._version, self._version_info = self.parseVersion(self._poetry["version"])
+        self._regarding = project_toml["tool"].get("regarding", {})
 
     @property
     def name(self):
-        return self.project["name"]
+        return self._poetry["name"]
 
     @property
     def description(self):
-        return self.project["description"]
+        return self._poetry["description"]
 
     @property
     def author(self):
-        author = self.project["authors"][0]
+        author = self._poetry["authors"][0]
         return author[:author.find("<")].strip()
 
     @property
     def author_email(self):
-        author = self.project["authors"][0]
+        author = self._poetry["authors"][0]
         return author[author.find("<") + 1:author.find(">")].strip()
 
     @property
     def authors(self):
-        return self.project["authors"]
+        return self._poetry["authors"]
 
     @property
     def version(self):
@@ -44,15 +45,15 @@ class ProjectToml:
 
     @property
     def release_name(self):
-        return self.project.get("release_name", "")
+        return self._regarding.get("release_name", "")
 
     @property
     def years(self):
-        return self.project.get("years", "")
+        return self._regarding.get("years", "")
 
     @property
     def homepage(self):
-        return self.project.get("homepage", "")
+        return self._poetry.get("homepage", "")
 
     @staticmethod
     def parseVersion(v):
