@@ -24,7 +24,7 @@ if os.path.exists(readme_path):
 setup(
     long_description=readme,
     name='regarding',
-    version='0.1.3',
+    version='0.1.4-alpha.0',
     description='Create __about__.py files from `pyproject.toml`.',
     python_requires='==3.*,>=3.6.0',
     project_urls={"homepage": "https://github.com/nicfit/regarding"},
@@ -35,5 +35,6 @@ setup(
     package_dir={"": "."},
     package_data={},
     install_requires=['setuptools==50.*,>=50.3.2', 'toml==0.*,>=0.10.2'],
-    extras_require={"dev": ["check-manifest==0.*,>=0.45.0", "dephell==0.*,>=0.8.3", "flake8==3.*,>=3.8.4", "pytest==5.*,>=5.2.0", "tox==3.*,>=3.20.1", "twine==3.*,>=3.2.0"]},
+    extras_require={"dev": ["check-manifest==0.*,>=0.45.0", "dephell==0.*,>=0.8.3",
+                            "flake8==3.*,>=3.8.4", "pytest==5.*,>=5.2.0", "tox==3.*,>=3.20.1", "twine==3.*,>=3.2.0"]},
 )

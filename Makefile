@@ -1,7 +1,8 @@
-help: ## List all commands
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-
 all: build test  ## Build and test
+
+help: ## List all commands
+	@# This code borrowed from https://github.com/jedie/poetry-publish/blob/master/Makefile
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 
 ## Data
@@ -12,6 +13,14 @@ PROJECT_NAME = $(shell python ./setup.py --name 2> /dev/null)
 VERSION = $(shell python ./setup.py --version 2> /dev/null)
 RELEASE_NAME = $(shell python ./setup.py --release-name 2> /dev/null)
 RELEASE_TAG = v$(VERSION)
+
+
+# Meta
+info:  ## Show project metadata
+	@echo "VERSION: $(VERSION)"
+	@echo "RELEASE_TAG: $(RELEASE_TAG)"
+	@echo "RELEASE_NAME: $(RELEASE_NAME)"
+	poetry show
 
 
 ## Build
@@ -52,7 +61,7 @@ test-dist: dist
 lint:  ## Check coding style
 	tox -e lint
 
-clean-test:
+clean-test:  ## Clean test artifacts (included in `clean`)
 	rm -rf tests/__pycache__ .pytest_cache .tox
 
 
@@ -72,7 +81,7 @@ dist: clean sdist bdist  ## Create source and binary distribution files
 	done
 	@ls dist
 
-clean-dist:
+clean-dist:  ## Clean distribution artifacts (included in `clean`)
 	rm -rf dist
 	find . -type f -name '*~' | xargs -r rm
 
@@ -124,11 +133,3 @@ _freeze-release:
 _tag-release:
 	git tag -a $(RELEASE_TAG) -m "Release $(RELEASE_TAG)"
 	git push --tags origin
-
-
-# Meta
-info:  ## Show project metadata
-	@echo "VERSION: $(VERSION)"
-	@echo "RELEASE_TAG: $(RELEASE_TAG)"
-	@echo "RELEASE_NAME: $(RELEASE_NAME)"
-	poetry show
