@@ -1,6 +1,10 @@
+[tool.regarding]
+years = "2020"
+release_name = ""
+
 [tool.poetry]
 name = "regarding"
-version = "0.1.2"
+version = "0.1.3"
 description = "Create __about__.py files from `pyproject.toml`."
 readme = "README.rst"
 authors = ["Travis Shirk <travis@pobox.com>"]

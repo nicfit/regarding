@@ -1,4 +1,7 @@
-all: build
+help: ## List all commands
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+all: build test  ## Build and test
 
 
 ## Data
@@ -12,7 +15,7 @@ RELEASE_TAG = v$(VERSION)
 
 
 ## Build
-build: regarding/__about__.py setup.py
+build: regarding/__about__.py setup.py  ## Build the project
 
 regarding/__about__.py: pyproject.toml
 	python -m regarding -o $@
@@ -28,15 +31,15 @@ clean-autogen:
 
 
 ## Clean
-clean: clean-test clean-dist
+clean: clean-test clean-dist  ## Clean the project
 	rm -rf regarding.egg-info regarding/__pycache__
 
 
 ## Test
-test:
+test:  ## Run tests with default python
 	tox -e default -- $(PYTEST_ARGS)
 
-test-all:
+test-all:  ## Run tests with all supported versions of Python
 	tox --parallel=all -- $(PYTEST_ARGS)
 
 test-dist: dist
@@ -46,7 +49,7 @@ test-dist: dist
 		twine check $$f ; \
 	done
 
-lint:
+lint:  ## Check coding style
 	tox -e lint
 
 clean-test:
@@ -61,7 +64,7 @@ bdist: build
 	poetry build --format wheel
 
 .PHONY: dist
-dist: clean sdist bdist
+dist: clean sdist bdist  ## Create source and binary distribution files
 	@# The cd dist keeps the dist/ prefix out of the md5sum files
 	cd dist && \
 	for f in $$(ls); do \
@@ -76,8 +79,8 @@ clean-dist:
 check-manifest:
 	check-manifest
 
-check-version-tag:
-	@if git tag -l | grep -E '^$(shell echo $${RELEASE_TAG} | sed 's|\.|.|g')$$' > /dev/null; then \
+_check-version-tag:
+	@if git tag -l | grep -E '^$(shell echo ${RELEASE_TAG} | sed 's|\.|.|g')$$' > /dev/null; then \
         echo "Version tag '${RELEASE_TAG}' already exists!"; \
         false; \
     fi
@@ -89,17 +92,17 @@ _pypi-release:
 
 
 ## Install
-install: build
+install: build  ## Install project and dependencies
 	poetry install --no-dev
 
-install-dev: build
+install-dev: build  ## Install projec, dependencies, and developer tools
 	poetry install
 
 
 ## Release
 release: pre-release _freeze-release test-all dist _tag-release _pypi-release
 
-pre-release: clean-autogen build install-dev info check-version-tag clean \
+pre-release: clean-autogen build install-dev info _check-version-tag clean \
              test test-dist check-manifest authors  # changelog
 
 BUMP ?= prerelease
@@ -107,6 +110,7 @@ bump-release: requirements
 	poetry version $(BUMP)
 
 requirements:
+	poetry show --outdated
 	poetry update --lock
 	poetry export -f requirements.txt --output requirements.txt
 
@@ -123,7 +127,8 @@ _tag-release:
 
 
 # Meta
-info:
+info:  ## Show project metadata
 	@echo "VERSION: $(VERSION)"
 	@echo "RELEASE_TAG: $(RELEASE_TAG)"
 	@echo "RELEASE_NAME: $(RELEASE_NAME)"
+	poetry show

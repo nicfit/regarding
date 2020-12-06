@@ -16,13 +16,13 @@ class Version:
 
 
 project_name = "regarding"
-version = "0.1.2"
+version = "0.1.3"
 release_name = ""
 author = "Travis Shirk"
 author_email = "travis@pobox.com"
-years = ""
+years = "2020"
 version_info = Version(
-    0, 1, 2,
+    0, 1, 3,
     "final", ""
 )
 description = "Create __about__.py files from `pyproject.toml`."
