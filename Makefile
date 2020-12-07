@@ -47,7 +47,7 @@ clean: clean-test clean-dist  ## Clean the project
 
 ## Test
 test:  ## Run tests with default python
-	tox -e default -- $(PYTEST_ARGS)
+	tox -e py -- $(PYTEST_ARGS)
 
 test-all:  ## Run tests with all supported versions of Python
 	tox --parallel=all -- $(PYTEST_ARGS)
