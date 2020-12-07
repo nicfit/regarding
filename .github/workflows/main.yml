@@ -26,10 +26,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox
+        python -m pip install poetry
     - name: Lint
       run: |
-        tox -e lint
+        make lint
+#        poetry run tox -e lint
     - name: Test
       run: |
-        tox -e py
+        poetry run tox -e py
