@@ -138,17 +138,23 @@ def _main(args):
 
 
 def main():
-    project_toml = ProjectToml()
+    try:
+        project_toml = ProjectToml()
+    except FileNotFoundError as not_found:
+        print(str(not_found), file=sys.stderr)
+        status = 2
+    else:
+        cli = argparse.ArgumentParser(description=project_toml.description)
+        cli.add_argument("--version", action="version", version=f"%(prog)s {project_toml.version}")
+        cli.add_argument("-o", "--out-file", type=argparse.FileType("w", encoding='UTF-8'), default="-",
+                         help="The output file, by default is file is printed to standard out.")
 
-    cli = argparse.ArgumentParser(description=project_toml.description)
-    cli.add_argument("--version", action="version", version=f"%(prog)s {project_toml.version}")
-    cli.add_argument("-o", "--out-file", type=argparse.FileType("w", encoding='UTF-8'), default="-",
-                     help="The output file, by default is file is printed to standard out.")
+        args = cli.parse_args()
+        args.project_toml = project_toml
 
-    args = cli.parse_args()
-    args.project_toml = project_toml
+        status = _main(args) or 0
 
-    sys.exit(_main(args) or 0)
+    sys.exit(status)
 
 
 if __name__ == "__main__":
