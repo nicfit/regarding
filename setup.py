@@ -25,7 +25,7 @@ setup(
     long_description=readme,
     name='regarding',
     version='0.1.4-alpha.0',
-    description='Create __about__.py files from `pyproject.toml`.',
+    description='Create __about__.py files for Poetry and setup.py projects.',
     python_requires='==3.*,>=3.6.0',
     project_urls={"homepage": "https://github.com/nicfit/regarding"},
     author='Travis Shirk',

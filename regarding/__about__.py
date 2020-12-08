@@ -24,5 +24,5 @@ version_info = Version(
     0, 1, 4,
     "a0", ""
 )
-description = "Create __about__.py files from `pyproject.toml`."
+description = "Create __about__.py files for Poetry and setup.py projects."
 homepage = "https://github.com/nicfit/regarding"

@@ -5,7 +5,7 @@ release_name = ""
 [tool.poetry]
 name = "regarding"
 version = "0.1.4-alpha.0"
-description = "Create __about__.py files from `pyproject.toml`."
+description = "Create __about__.py files for Poetry and setup.py projects."
 readme = "README.rst"
 authors = ["Travis Shirk <travis@pobox.com>"]
 include = [
