@@ -18,14 +18,14 @@ class Version:
 
 
 project_name = "regarding"
-version = "0.1.4a0"
+version = "0.1.4a1"
 release_name = ""
 author = "Travis Shirk"
 author_email = "travis@pobox.com"
 years = "2020"
 version_info = Version(
     0, 1, 4,
-    "a0", ""
+    "a1", ""
 )
 description = "Create __about__.py files for Poetry and setup.py projects."
 homepage = "https://github.com/nicfit/regarding"
