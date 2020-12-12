@@ -26,13 +26,13 @@ info:  ## Show project metadata
 .PHONY: build
 build: $(ABOUT_PY) setup.py  ## Build the project
 
+setup.py: pyproject.toml poetry.lock
+	dephell deps convert --from pyproject.toml --to setup.py
+
 $(ABOUT_PY): pyproject.toml
 	python -m regarding -o $@
 	# Run again for bootstrapping new values
 	python -m regarding -o $@
-
-setup.py: pyproject.toml poetry.lock
-	dephell deps convert --from pyproject.toml --to setup.py
 
 # Note, this clean rule is NOT to be called as part of `clean`
 clean-autogen:
