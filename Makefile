@@ -116,6 +116,7 @@ release: pre-release _freeze-release test-all dist _tag-release _pypi-release
 
 pre-release: clean-autogen build install-dev info _check-version-tag clean \
              test test-dist check-manifest authors changelog
+	@git status -s -b
 
 BUMP ?= prerelease
 bump-release: requirements
