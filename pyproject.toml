@@ -4,7 +4,7 @@ release_name = ""
 
 [tool.poetry]
 name = "regarding"
-version = "0.1.4-alpha.1"
+version = "0.1.4"
 description = "Create __about__.py files for Poetry and setup.py projects."
 readme = "README.rst"
 authors = ["Travis Shirk <travis@pobox.com>"]
