@@ -123,8 +123,9 @@ pre-release: clean-autogen build install-dev info _check-version-tag clean \
 	@git status -s -b
 
 BUMP ?= prerelease
-bump-release: requirements
+bump-version: requirements
 	poetry version $(BUMP)
+	$(MAKE) build
 
 requirements:
 	poetry show --outdated
