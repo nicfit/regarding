@@ -4,8 +4,8 @@ release_name = ""
 
 [tool.poetry]
 name = "regarding"
-version = "0.1.4-alpha.0"
-description = "Create __about__.py files from `pyproject.toml`."
+version = "0.1.4-alpha.1"
+description = "Create __about__.py files for Poetry and setup.py projects."
 readme = "README.rst"
 authors = ["Travis Shirk <travis@pobox.com>"]
 include = [
@@ -21,6 +21,7 @@ regarding = "regarding.__main__:main"
 python = "^3.6"
 toml = "^0.10.2"
 setuptools = "^50.3.2"
+dataclasses = {version = "^0.8", python = "~3.6"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

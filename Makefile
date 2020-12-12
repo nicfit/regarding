@@ -14,6 +14,10 @@ all: build test  ## Build and test
 help: ## List all commands
 	@# This code borrowed from https://github.com/jedie/poetry-publish/blob/master/Makefile
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "Options:"
+	@printf "\033[36m%-20s\033[0m %s\n" PYTEST_ARGS "If defined PDB options are added when 'pytest' is invoked"
+	@printf "\033[36m%-20s\033[0m %s\n" PYPI_REPO "The package index to publish, `pypi` by default."
 
 info:  ## Show project metadata
 	@echo "VERSION: $(VERSION)"
@@ -26,13 +30,13 @@ info:  ## Show project metadata
 .PHONY: build
 build: $(ABOUT_PY) setup.py  ## Build the project
 
+setup.py: pyproject.toml poetry.lock
+	dephell deps convert --from pyproject.toml --to setup.py
+
 $(ABOUT_PY): pyproject.toml
 	python -m regarding -o $@
 	# Run again for bootstrapping new values
 	python -m regarding -o $@
-
-setup.py: pyproject.toml poetry.lock
-	dephell deps convert --from pyproject.toml --to setup.py
 
 # Note, this clean rule is NOT to be called as part of `clean`
 clean-autogen:
@@ -116,10 +120,12 @@ release: pre-release _freeze-release test-all dist _tag-release _pypi-release
 
 pre-release: clean-autogen build install-dev info _check-version-tag clean \
              test test-dist check-manifest authors changelog
+	@git status -s -b
 
 BUMP ?= prerelease
-bump-release: requirements
+bump-version: requirements
 	poetry version $(BUMP)
+	$(MAKE) build
 
 requirements:
 	poetry show --outdated
