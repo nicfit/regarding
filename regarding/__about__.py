@@ -4,6 +4,9 @@ https://github.com/nicfit/regarding
 """
 import dataclasses
 
+__all__ = ["Version", "project_name", "version", "version_info", "release_name",
+           "author", "author_email", "years", "description", "homepage"]
+
 
 @dataclasses.dataclass
 class Version:
