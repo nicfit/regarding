@@ -14,6 +14,10 @@ all: build test  ## Build and test
 help: ## List all commands
 	@# This code borrowed from https://github.com/jedie/poetry-publish/blob/master/Makefile
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "Options:"
+	@printf "\033[36m%-20s\033[0m %s\n" PYTEST_ARGS "If defined PDB options are added when 'pytest' is invoked"
+	@printf "\033[36m%-20s\033[0m %s\n" PYPI_REPO "The package index to publish, `pypi` by default."
 
 info:  ## Show project metadata
 	@echo "VERSION: $(VERSION)"
