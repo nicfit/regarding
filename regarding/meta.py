@@ -25,23 +25,29 @@ class ProjectMeta:
         from pkg_resources.extern.packaging.version import Version
 
         # Some validation and normalization (e.g. 1.0-a1 -> 1.0a1)
-        V = parse_version(v)
-        if not isinstance(V, Version):
+        parsed_v = parse_version(v)
+        if not isinstance(parsed_v, Version):
             raise ValueError(f"Invalid version: {v}")
 
-        ver = str(V)
-        if V._version.pre:
-            rel = "".join([str(v) for v in V._version.pre])
+        ver = str(parsed_v)
+        if parsed_v.pre:
+            # pre is a 2-tuple like ('a', 1)
+            rel = f"{parsed_v.pre[0]}{parsed_v.pre[1]}"
         else:
             rel = "final"
 
         # Although parsed the following components are not captured: post, dev, local, epoch
-        Version = namedtuple("Version", "major, minor, maint, release")
-        ver_info = Version(V._version.release[0],
-                           V._version.release[1] if len(V._version.release) > 1 else 0,
-                           V._version.release[2] if len(V._version.release) > 2 else 0,
-                           rel)
+        Version = namedtuple("Version", "major, minor, maint, release, post, dev")
+        ver_info = Version(
+            major=parsed_v.release[0],
+            minor=parsed_v.release[1] if len(parsed_v.release) > 1 else 0,
+            maint=parsed_v.release[2] if len(parsed_v.release) > 2 else 0,
+            release=rel,
+            post=parsed_v.post,
+            dev=parsed_v.dev,
+        )
         return ver, ver_info
+
 
     @property
     def name(self):
@@ -98,8 +104,8 @@ class ProjectToml(ProjectMeta):
         self._author_email = author[author.find("<") + 1:author.find(">")].strip()
 
         regarding = project_toml["tool"].get("regarding", {})
-        self._release_name = regarding.get("release_name", "")
-        self._years = regarding.get("years", "")
+        self._release_name = regarding.get("release_name", None)
+        self._years = regarding.get("years", None)
 
     @property
     def authors(self):

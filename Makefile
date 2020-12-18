@@ -17,7 +17,8 @@ help: ## List all commands
 	@echo ""
 	@echo "Options:"
 	@printf "\033[36m%-20s\033[0m %s\n" PYTEST_ARGS "If defined PDB options are added when 'pytest' is invoked"
-	@printf "\033[36m%-20s\033[0m %s\n" PYPI_REPO "The package index to publish, `pypi` by default."
+	@printf "\033[36m%-20s\033[0m %s\n" PYPI_REPO "The package index to publish, 'pypi' by default."
+	@printf "\033[36m%-20s\033[0m %s\n" BROWSER "HTML viewer used by docs-view/coverage-view"
 
 info:  ## Show project metadata
 	@echo "VERSION: $(VERSION)"
@@ -55,6 +56,16 @@ test:  ## Run tests with default python
 
 test-all:  ## Run tests with all supported versions of Python
 	tox --parallel=all -- $(PYTEST_ARGS)
+
+
+coverage:
+	tox -e coverage
+
+coverage-view:
+	@if [ ! -f build/tests/coverage/index.html ]; then \
+		${MAKE} coverage; \
+	fi
+	@${BROWSER} build/tests/coverage/index.html
 
 test-dist: dist
 	poetry check

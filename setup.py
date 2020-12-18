@@ -24,7 +24,7 @@ if os.path.exists(readme_path):
 setup(
     long_description=readme,
     name='regarding',
-    version='0.1.4',
+    version='0.1.5-alpha.0',
     description='Create __about__.py files for Poetry and setup.py projects.',
     python_requires='==3.*,>=3.6.0',
     project_urls={"homepage": "https://github.com/nicfit/regarding"},

@@ -1,7 +1,7 @@
 try:
     from .__about__ import version as __version__
     from .__about__ import version_info as __version_info__
-except ImportError:
+except ImportError:  # pragma: no cover
     # During bootstrap
     __version__, __version_info__ = None, None
 
