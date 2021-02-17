@@ -1,31 +1,44 @@
-PYTEST_ARGS ?=
+## User settings
+PYTEST_ARGS ?= ./tests
 PYPI_REPO ?= pypi
 
-PROJECT_NAME = $(shell python ./setup.py --name 2> /dev/null)
-VERSION = $(shell python ./setup.py --version 2> /dev/null)
-RELEASE_NAME = $(shell python ./setup.py --release-name 2> /dev/null)
-RELEASE_TAG = v$(VERSION)
-ABOUT_PY = regarding/__about__.py
+
+ifdef TERM
+BOLD_COLOR = $(shell tput bold)
+HELP_COLOR = $(shell tput setaf 6)
+HEADER_COLOR = $(BOLD_COLOR)$(shell tput setaf 2)
+NO_COLOR = $(shell tput sgr0)
+endif
+
 
 all: build test  ## Build and test
 
 
-# Meta
-help: ## List all commands
+help:  ## List all commands
+	@printf "\n$(BOLD_COLOR)***** eyeD3 Makefile help *****$(NO_COLOR)\n"
 	@# This code borrowed from https://github.com/jedie/poetry-publish/blob/master/Makefile
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "$(HELP_COLOR)%-20s$(NO_COLOR) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@printf "$(BOLD_COLOR)Options:$(NO_COLOR)\n"
+	@printf "$(HELP_COLOR)%-20s$(NO_COLOR) %s\n" PYTEST_ARGS "If defined PDB options are added when 'pytest' is invoked"
+	@printf "$(HELP_COLOR)%-20s$(NO_COLOR) %s\n" PYPI_REPO "The package index to publish, 'pypi' by default."
+	@printf "$(HELP_COLOR)%-20s$(NO_COLOR) %s\n" BROWSER "HTML viewer used by docs-view/coverage-view"
+	@printf "$(HELP_COLOR)%-20s$(NO_COLOR) %s\n" CC_MERGE "Set to no to disable cookiecutter merging."
+	@printf "$(HELP_COLOR)%-20s$(NO_COLOR) %s\n" CC_OPTS "OVerrided the default options (--no-input) with your own."
 	@echo ""
 	@echo "Options:"
 	@printf "\033[36m%-20s\033[0m %s\n" PYTEST_ARGS "If defined PDB options are added when 'pytest' is invoked"
 	@printf "\033[36m%-20s\033[0m %s\n" PYPI_REPO "The package index to publish, 'pypi' by default."
 	@printf "\033[36m%-20s\033[0m %s\n" BROWSER "HTML viewer used by docs-view/coverage-view"
 
-info:  ## Show project metadata
-	@echo "VERSION: $(VERSION)"
-	@echo "RELEASE_TAG: $(RELEASE_TAG)"
-	@echo "RELEASE_NAME: $(RELEASE_NAME)"
-	poetry show
 
+## Config
+PROJECT_NAME = $(shell python setup.py --name 2> /dev/null)
+VERSION = $(shell python setup.py --version 2> /dev/null)
+SRC_DIRS = ./regarding
+ABOUT_PY = regarding/__about__.py
+RELEASE_NAME = $(shell sed -n "s/^release_name = \"\(.*\)\"/\1/p" pyproject.toml)
+RELEASE_TAG = v$(VERSION)
 
 ## Build
 .PHONY: build
