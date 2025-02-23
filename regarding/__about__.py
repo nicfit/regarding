@@ -22,14 +22,14 @@ class Version:
 
 
 project_name = "regarding"
-version = "0.1.5a0"
+version = "0.2.0"
 release_name = ""
 author = "Travis Shirk"
 author_email = "travis@pobox.com"
-years = "2020"
+years = "2020,2025"
 version_info = Version(
-    0, 1, 5,
-    "a0",
+    0, 2, 0,
+    "final",
     None, None,
     "",
 )

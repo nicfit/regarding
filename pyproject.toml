@@ -1,41 +1,53 @@
-[tool.regarding]
-years = "2020"
-release_name = ""
-
-[tool.poetry]
+[project]
 name = "regarding"
-version = "0.1.5-alpha.0"
+version = "0.2.0"
 description = "Create __about__.py files for Poetry and setup.py projects."
-readme = "README.rst"
-authors = ["Travis Shirk <travis@pobox.com>"]
-include = [
-    "AUTHORS", "Makefile", "tox.ini", "poetry.lock", "requirements.txt",
-    "tests/*.py"
+authors = [
+    {name = "Travis Shirk",email = "travis@pobox.com"}
 ]
+license = {text = "MIT"}
+readme = "README.rst"
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "toml (>=0.10.2,<0.11.0)",
+    "packaging (>=24.2,<25.0)"
+]
+
+[project.urls]
 homepage = "https://github.com/nicfit/regarding"
 
 [tool.poetry.scripts]
 regarding = "regarding.__main__:main"
 
-[tool.poetry.dependencies]
-python = "^3.6"
-toml = "^0.10.2"
-setuptools = "^50.3.2"
-dataclasses = {version = "^0.8", python = "~3.6"}
+[tool.poetry]
+include = [
+    "AUTHORS", "Makefile", "tox.ini", "poetry.lock", "requirements.txt",
+    "tests/*.py"
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
 dephell = "^0.8.3"
-tox = "^3.20.1"
-twine = "^3.2.0"
-check-manifest = "^0.45"
-flake8 = "^3.8.4"
+tox = "^4.24.1"
+twine = "^6.1.0"
+check-manifest = "^0.50"
+flake8 = "^7.1.2"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[tool.dephell]
-[tool.dephell.main]
-from = {format = "poetry", path = "pyproject.toml"}
-to = {format = "setuppy", path = "setup.py"}
+[tool.regarding]
+years = "2020,2025"
+release_name = ""
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
+#[tool.dephell]
+#[tool.dephell.main]
+#from = {format = "poetry", path = "pyproject.toml"}
+#to = {format = "setuppy", path = "setup.py"}
