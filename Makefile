@@ -132,11 +132,11 @@ _pypi-release:
 
 
 ## Install
-install: build  ## Install project and dependencies
-	poetry install --no-dev
-
-install-dev: build  ## Install projec, dependencies, and developer tools
+install:   ## Install project and dependencies
 	poetry install
+
+install-dev:   ## Install project, dependencies, and developer tools
+	poetry install --with=dev
 
 
 ## Release
@@ -154,7 +154,8 @@ bump-version: requirements
 requirements:
 	poetry show --outdated
 	poetry update --lock
-	poetry export -f requirements.txt --output requirements.txt
+	poetry export -f requirements.txt --output requirements.txt --all-extras --without-hashes
+	poetry export -f requirements.txt --output dev-requirements.txt --with=dev --without-hashes
 
 next-release: install-dev info
 

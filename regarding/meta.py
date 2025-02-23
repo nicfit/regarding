@@ -21,32 +21,30 @@ class ProjectMeta:
 
     @staticmethod
     def parseVersion(v):
-        from pkg_resources import parse_version
-        from pkg_resources.extern.packaging.version import Version
+        from packaging import version
+        #from packaging.version import parse as parse_version
 
         # Some validation and normalization (e.g. 1.0-a1 -> 1.0a1)
-        parsed_v = parse_version(v)
-        if not isinstance(parsed_v, Version):
-            raise ValueError(f"Invalid version: {v}")
+        parsed_v = version.parse(v)
 
-        ver = str(parsed_v)
-        if parsed_v.pre:
-            # pre is a 2-tuple like ('a', 1)
-            rel = f"{parsed_v.pre[0]}{parsed_v.pre[1]}"
+        if parsed_v.is_devrelease or parsed_v.is_prerelease or  parsed_v.is_postrelease:
+            rel = parsed_v.public.split(".")[-1]
         else:
             rel = "final"
 
         # Although parsed the following components are not captured: post, dev, local, epoch
-        Version = namedtuple("Version", "major, minor, maint, release, post, dev")
+        Version = namedtuple("Version",
+                             "major, minor, maint, release, dev, pre, post")
         ver_info = Version(
             major=parsed_v.release[0],
             minor=parsed_v.release[1] if len(parsed_v.release) > 1 else 0,
             maint=parsed_v.release[2] if len(parsed_v.release) > 2 else 0,
             release=rel,
-            post=parsed_v.post,
             dev=parsed_v.dev,
+            pre=parsed_v.pre,
+            post=parsed_v.post,
         )
-        return ver, ver_info
+        return parsed_v.public, ver_info
 
 
     @property
@@ -92,7 +90,7 @@ class ProjectToml(ProjectMeta):
 
     def __init__(self):
         project_toml = toml.loads(Path(self.meta_file).read_text())
-        self._poetry = project_toml["tool"]["poetry"]
+        self._poetry = project_toml["project"]
 
         self._name = self._poetry["name"]
         self._version, self._version_info = self.parseVersion(self._poetry["version"])
@@ -100,8 +98,8 @@ class ProjectToml(ProjectMeta):
         self._homepage = self._poetry.get("homepage", "")
 
         author = self._poetry["authors"][0]
-        self._author = author[:author.find("<")].strip()
-        self._author_email = author[author.find("<") + 1:author.find(">")].strip()
+        self._author = author["name"]
+        self._author_email = author["email"]
 
         regarding = project_toml["tool"].get("regarding", {})
         self._release_name = regarding.get("release_name", None)
