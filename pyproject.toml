@@ -1,3 +1,10 @@
+[build-system]
+requires = [
+    "setuptools",
+    "build",
+]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "regarding"
 version = "0.2.0"
@@ -6,46 +13,42 @@ authors = [
     {name = "Travis Shirk",email = "travis@pobox.com"}
 ]
 license = {text = "MIT"}
-readme = "README.rst"
-requires-python = ">=3.9,<4.0"
-dependencies = [
-    "toml (>=0.10.2,<0.11.0)",
-    "packaging (>=24.2,<25.0)"
-]
-
-[project.urls]
-homepage = "https://github.com/nicfit/regarding"
-
-[tool.poetry.scripts]
-regarding = "regarding.__main__:main"
-
-[tool.poetry]
-include = [
-    "AUTHORS", "Makefile", "tox.ini", "poetry.lock", "requirements.txt",
-    "tests/*.py"
-]
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-dephell = "^0.8.3"
-tox = "^4.24.1"
-twine = "^6.1.0"
-check-manifest = "^0.50"
-flake8 = "^7.1.2"
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.regarding]
-years = "2020,2025"
-release_name = ""
-
-[tool.poetry.requires-plugins]
-poetry-plugin-export = ">=1.8"
+#readme = "README.rst"
+#requires-python = ">=3.9,<4.0"
+#dependencies = [
+#    "toml (>=0.10.2,<0.11.0)",
+#    "packaging (>=24.2,<25.0)"
+#]
+#
+#[project.urls]
+#homepage = "https://github.com/nicfit/regarding"
+#
+#[tool.poetry.scripts]
+#regarding = "regarding.__main__:main"
+#
+#[tool.poetry]
+#include = [
+#    "AUTHORS", "Makefile", "tox.ini", "poetry.lock", "requirements.txt",
+#    "tests/*.py"
+#]
+#
+#[tool.poetry.group.dev]
+#optional = true
+#
+#[tool.poetry.group.dev.dependencies]
+#pytest = "^8.3.4"
+#dephell = "^0.8.3"
+#tox = "^4.24.1"
+#twine = "^6.1.0"
+#check-manifest = "^0.50"
+#flake8 = "^7.1.2"
+#
+#[tool.regarding]
+#years = "2020,2025"
+#release_name = ""
+#
+#[tool.poetry.requires-plugins]
+#poetry-plugin-export = ">=1.8"
 
 #[tool.dephell]
 #[tool.dephell.main]

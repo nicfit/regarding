@@ -1,2 +1,0 @@
-packaging==24.2 ; python_version >= "3.9" and python_version < "4.0"
-toml==0.10.2 ; python_version >= "3.9" and python_version < "4.0"
