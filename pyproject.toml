@@ -1,27 +1,24 @@
 [build-system]
-requires = [
-    "setuptools",
-    "build",
-]
-build-backend = "setuptools.build_meta"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [project]
 name = "regarding"
-version = "0.2.0"
-description = "Create __about__.py files for Poetry and setup.py projects."
+version = "0.3.0"
+description = "Create __about__.py files for Python project metadata."
 authors = [
-    {name = "Travis Shirk",email = "travis@pobox.com"}
+    {name = "Travis Shirk",email = "travis@pobox.com"},
 ]
 license = {text = "MIT"}
-#readme = "README.rst"
-#requires-python = ">=3.9,<4.0"
-#dependencies = [
-#    "toml (>=0.10.2,<0.11.0)",
-#    "packaging (>=24.2,<25.0)"
-#]
-#
-#[project.urls]
-#homepage = "https://github.com/nicfit/regarding"
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "toml",
+    "packaging",
+]
+
+[project.urls]
+homepage = "https://github.com/nicfit/regarding"
 #
 #[tool.poetry.scripts]
 #regarding = "regarding.__main__:main"
@@ -42,11 +39,11 @@ license = {text = "MIT"}
 #twine = "^6.1.0"
 #check-manifest = "^0.50"
 #flake8 = "^7.1.2"
-#
-#[tool.regarding]
-#years = "2020,2025"
-#release_name = ""
-#
+
+[tool.regarding]
+years = "2020,2025"
+release_name = ""
+
 #[tool.poetry.requires-plugins]
 #poetry-plugin-export = ">=1.8"
 
@@ -54,3 +51,5 @@ license = {text = "MIT"}
 #[tool.dephell.main]
 #from = {format = "poetry", path = "pyproject.toml"}
 #to = {format = "setuppy", path = "setup.py"}
+[tool.pdm]
+distribution = true

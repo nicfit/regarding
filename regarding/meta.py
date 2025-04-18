@@ -85,19 +85,25 @@ class ProjectMeta:
 
 
 class ProjectToml(ProjectMeta):
-    """Poetry meta data"""
+    """pyproject meta data"""
     meta_file = "pyproject.toml"
 
     def __init__(self):
         project_toml = toml.loads(Path(self.meta_file).read_text())
-        self._poetry = project_toml["project"]
+        self._pyproject = project_toml["project"]
 
-        self._name = self._poetry["name"]
-        self._version, self._version_info = self.parseVersion(self._poetry["version"])
-        self._description = self._poetry["description"]
-        self._homepage = self._poetry.get("homepage", "")
+        self._name = self._pyproject["name"]
+        self._version, self._version_info = self.parseVersion(self._pyproject["version"])
+        self._description = self._pyproject["description"]
 
-        author = self._poetry["authors"][0]
+        urls = self._pyproject.get("urls", None)
+        if urls:
+            self._homepage = urls.get("homepage", None)
+        else:
+            # old
+            self._homepage = self._pyproject.get("homepage", "")
+
+        author = self._pyproject["authors"][0]
         self._author = author["name"]
         self._author_email = author["email"]
 
@@ -107,7 +113,7 @@ class ProjectToml(ProjectMeta):
 
     @property
     def authors(self):
-        return self._poetry["authors"]
+        return self._pyproject["authors"]
 
 
 class SetupPy(ProjectMeta):

@@ -22,17 +22,17 @@ class Version:
 
 
 project_name = "regarding"
-version = "0.2.0"
+version = "0.3.0"
 release_name = ""
 author = "Travis Shirk"
 author_email = "travis@pobox.com"
 years = "2020,2025"
 version_info = Version(
-    0, 2, 0,
+    0, 3, 0,
     "final",
     None, None,
     "",
 )
-description = "Create __about__.py files for Poetry and setup.py projects."
+description = "Create __about__.py files for Python project metadata."
 homepage = "https://github.com/nicfit/regarding"
 

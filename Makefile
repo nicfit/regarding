@@ -5,18 +5,23 @@ PYTEST_ARGS ?= ./tests
 PYPI_REPO ?= pypi
 
 ## Config
-PROJECT_NAME = $(shell python setup.py --name 2> /dev/null)
-VERSION = $(shell python setup.py --version 2> /dev/null)
-SRC_DIRS = ./regarding
-ABOUT_PY = regarding/__about__.py
+PROJECT_NAME := $(shell pdm show --name 2> /dev/null)
+ifeq ($(strip $(PROJECT_NAME)),)
+  $(error "PROJECT_NAME not set")
+endif
+VERSION := $(shell pdm show --version 2> /dev/null)
+ifeq ($(strip $(VERSION)),)
+  $(error "VERSION not set")
+endif
+ABOUT_PY := regarding/__about__.py
 RELEASE_NAME = $(shell sed -n "s/^release_name = \"\(.*\)\"/\1/p" pyproject.toml)
 RELEASE_TAG = v$(VERSION)
 
 ifdef TERM
-BOLD_COLOR = $(shell tput bold)
-HELP_COLOR = $(shell tput setaf 6)
-HEADER_COLOR = $(BOLD_COLOR)$(shell tput setaf 2)
-NO_COLOR = $(shell tput sgr0)
+  BOLD_COLOR := $(shell tput bold)
+  HELP_COLOR := $(shell tput setaf 6)
+  HEADER_COLOR := $(BOLD_COLOR)$(shell tput setaf 2)
+  NO_COLOR := $(shell tput sgr0)
 endif
 
 
@@ -24,7 +29,7 @@ all: clean build test  ## Build and test
 
 
 help:  ## List all commands
-	@printf "\n$(BOLD_COLOR)***** $(PROJECT_NAME) Makefile help *****$(NO_COLOR)\n"
+	@printf "\n$(BOLD_COLOR)***** $(PROJECT_NAME) $(VERSION): Makefile help *****$(NO_COLOR)\n"
 	@# This code borrowed from https://github.com/jedie/poetry-publish/blob/master/Makefile
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9 -]+:.*?## / {printf "$(HELP_COLOR)%-20s$(NO_COLOR) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
@@ -37,16 +42,24 @@ help:  ## List all commands
 
 
 ## Build
-#.PHONY: build
-#build: $(ABOUT_PY) setup.py  ## Build the project
+.PHONY: build
+build: install ## Build the project
+	@echo "$(HEADER_COLOR)Building $(PROJECT_NAME) $(VERSION)...$(NO_COLOR)"
+	pdm build
+	$(MAKE) $(ABOUT_PY)
+
+install:  ## Install the project
+	@echo "$(HEADER_COLOR)Installing $(PROJECT_NAME) $(VERSION)...$(NO_COLOR)"
+	pdm install
+
 #
 #setup.py: pyproject.toml poetry.lock
 #	dephell deps convert --from pyproject.toml --to setup.py
 #
-#$(ABOUT_PY): pyproject.toml
-#	python -m regarding -o $@
-#	# Run again for bootstrapping new values
-#	python -m regarding -o $@
+$(ABOUT_PY): pyproject.toml
+	python -m regarding -o $@
+	# Run again for bootstrapping new values
+	python -m regarding -o $@
 
 # Note, this clean rule is NOT to be called as part of `clean`
 #clean-autogen:
@@ -54,9 +67,10 @@ help:  ## List all commands
 
 
 ## Clean
-#clean: clean-test clean-dist  ## Clean the project
-#	rm -rf regarding.egg-info
-#	find -type d -name __pycache__ | xargs -r rm -rf
+clean: clean-test clean-dist  ## Clean the project
+	rm -rf build
+	find -type d -name __pycache__ | xargs -r rm -rf
+	rm -rf regarding.egg-info
 
 
 ## Test
@@ -86,9 +100,9 @@ help:  ## List all commands
 #lint:  ## Check coding style
 #	tox -e lint
 #
-#clean-test:  ## Clean test artifacts (included in `clean`)
-#	rm -rf .tox
-#	rm -rf tests/__pycache__ .pytest_cache
+clean-test:  ## Clean test artifacts (included in `clean`)
+	rm -rf .tox
+	rm -rf tests/__pycache__ .pytest_cache
 
 
 ## Distribute
@@ -107,9 +121,9 @@ help:  ## List all commands
 #	done
 #	@ls dist
 #
-#clean-dist:  ## Clean distribution artifacts (included in `clean`)
-#	rm -rf dist
-#	find . -type f -name '*~' | xargs -r rm
+clean-dist:  ## Clean distribution artifacts (included in `clean`)
+	rm -rf dist
+	find . -type f -name '*~' | xargs -r rm
 #
 #check-manifest:
 #	check-manifest
