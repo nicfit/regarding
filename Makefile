@@ -107,7 +107,7 @@ bdist:
 	pdm build --no-sdist -d dist --no-clean
 
 .PHONY: dist
-dist: all sdist bdist check-manifest  ## Create source and binary distribution files
+dist: all lint sdist bdist check-manifest  ## Create source and binary distribution files
 	@# The cd dist keeps the dist/ prefix out of the md5sum files
 	@cd dist && \
 	for f in $$(ls); do \
