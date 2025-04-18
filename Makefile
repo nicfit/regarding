@@ -61,11 +61,6 @@ $(ABOUT_PY): pyproject.toml
 	# Run again for bootstrapping new values
 	python -m regarding -o $@
 
-# Note, this clean rule is NOT to be called as part of `clean`
-#clean-autogen:
-#	-rm $(ABOUT_PY) setup.py
-
-
 ## Clean
 clean: clean-test clean-dist  ## Clean the project
 	rm -rf build
