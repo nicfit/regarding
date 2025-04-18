@@ -7,7 +7,7 @@ import pytest
 from io import StringIO
 from pathlib import Path
 from regarding.__main__ import main
-from regarding.meta import ProjectMeta, SetupPy, ProjectToml
+from regarding.meta import ProjectMeta, ProjectToml
 
 TOP_D = Path(__file__).parent.parent
 tempdir = tempfile.mkdtemp()
@@ -36,8 +36,6 @@ def test_module_version():
     from regarding import __version__, __version_info__
     from regarding.__about__ import version, version_info, project_name
 
-    assert bool(__version__)
-    assert bool(__version_info__)
     assert __version__ == version
     assert __version_info__ == version_info
 
@@ -86,64 +84,98 @@ def test_cmdline_default_output(tmp_path):
 
 
 def test_meta_parseVersion():
-    vstr, version = ProjectMeta.parseVersion("0.0.0")
-    assert vstr == "0.0.0"
-    assert version == (0, 0, 0, "final", None, None)
+    version = ProjectMeta.parseVersion("0.0.0")
+    assert str(version) == "0.0.0"
 
-    vstr, version = ProjectMeta.parseVersion("1.22.333")
-    assert vstr == "1.22.333"
-    assert version == (1, 22, 333, "final", None, None)
+    version = ProjectMeta.parseVersion("1.22.333")
+    assert str(version) == "1.22.333"
 
 
 def test_meta_parseVersion_prereleases():
     for prel in ("-alpha45", "a45"):
-        vstr, version = ProjectMeta.parseVersion(f"1.22.333{prel}")
-        assert vstr == "1.22.333a45"
-        assert version == (1, 22, 333, "a45", None, None)
+        version = ProjectMeta.parseVersion(f"1.22.333{prel}")
+        assert version.public == "1.22.333a45" == str(version)
+        assert version.major == 1
+        assert version.minor == 22
+        assert version.micro == 333
+        assert version.is_prerelease
+        assert not version.is_devrelease
+        assert not version.is_postrelease
+        assert version.pre == ("a", 45)
 
     for prel in ("-beta", "b"):
-        vstr, version = ProjectMeta.parseVersion(f"1.22.333{prel}")
-        assert vstr == "1.22.333b0"
-        assert version == (1, 22, 333, "b0", None, None)
+        version = ProjectMeta.parseVersion(f"1.22.333{prel}")
+        assert version.public == "1.22.333b0" == str(version)
+        assert version.major == 1
+        assert version.minor == 22
+        assert version.micro == 333
+        assert version.is_prerelease
+        assert not version.is_devrelease
+        assert not version.is_postrelease
+        assert version.pre == ("b", 0)
 
     for prel in ("rc1",):
-        vstr, version = ProjectMeta.parseVersion(f"1.22.333{prel}")
-        assert vstr == "1.22.333rc1"
-        assert version == (1, 22, 333, "rc1", None, None)
+        version = ProjectMeta.parseVersion(f"1.22.333{prel}")
+        assert version.public == "1.22.333rc1" == str(version)
+        assert version.major == 1
+        assert version.minor == 22
+        assert version.micro == 333
+        assert version.is_prerelease
+        assert not version.is_devrelease
+        assert not version.is_postrelease
+        assert version.pre == ("rc", 1)
 
 
 def test_meta_parseVersion_postreleases():
-    vstr, version = ProjectMeta.parseVersion(f"1.0.0.post5")
-    assert vstr == "1.0.0.post5"
-    assert version == (1, 0, 0, "final", 5, None)
+    version = ProjectMeta.parseVersion(f"1.0.0.post5")
+    assert version.public == "1.0.0.post5" == str(version)
+    assert version.major == 1
+    assert version.minor == 0
+    assert version.micro == 0
+    assert not version.is_prerelease
+    assert not version.is_devrelease
+    assert version.is_postrelease
+    assert version.post == 5
 
-    vstr, version = ProjectMeta.parseVersion(f"1.0.0b4.post9")
-    assert version == (1, 0, 0, "b4", 9, None)
+    version = ProjectMeta.parseVersion(f"1.0.5b4.post9")
+    assert version.public == "1.0.5b4.post9" == str(version)
+    assert version.major == 1
+    assert version.minor == 0
+    assert version.micro == 5
+    assert version.is_prerelease
+    assert not version.is_devrelease
+    assert version.is_postrelease
+    assert version.pre == ("b", 4)
+    assert version.post == 9
 
 
 def test_meta_parseVersion_devreleases():
-    vstr, version = ProjectMeta.parseVersion(f"1.0.0.dev")
-    assert vstr == "1.0.0.dev0"
-    assert version == (1, 0, 0, "final", None, 0)
+    version = ProjectMeta.parseVersion(f"1.0.0.dev")
+    assert version.public == "1.0.0.dev0" == str(version)
+    assert version.major == 1
+    assert version.minor == 0
+    assert version.micro == 0
+    assert version.is_prerelease
+    assert version.pre is None
+    assert version.is_devrelease
+    assert not version.is_postrelease
+    assert version.dev == 0
 
-    vstr, version = ProjectMeta.parseVersion(f"1.0.0b4.dev9")
-    assert vstr == "1.0.0b4.dev9"
-    assert version == (1, 0, 0, "b4", None, 9)
-
+    version = ProjectMeta.parseVersion(f"1.0.0b4.dev9")
+    assert version.public == "1.0.0b4.dev9" == str(version)
+    assert version.major == 1
+    assert version.minor == 0
+    assert version.micro == 0
+    assert version.is_prerelease
+    assert version.pre == ("b", 4)
+    assert version.is_devrelease
+    assert not version.is_postrelease
+    assert version.dev == 9
 
 def test_meta_parseVersion_invalid():
-    with pytest.raises(ValueError):
+    import packaging.version
+    with pytest.raises(packaging.version.InvalidVersion):
         ProjectMeta.parseVersion(f"Godflesh")
-    ...
-
-
-def test_setuppy_meta(setup_py_project_path):
-    os.chdir(str(setup_py_project_path))
-    project = SetupPy()
-    _assertProjectMeta(project)
-
-    # FIXME: add tests for the extensions via setup.cfg
-
 
 def test_pyprojecttoml_meta(pyproject_toml_project_path):
     os.chdir(str(pyproject_toml_project_path))
@@ -154,10 +186,11 @@ def test_pyprojecttoml_meta(pyproject_toml_project_path):
 
 
 def _assertProjectMeta(proj: ProjectMeta):
-    assert proj.version == "6.6.6"
+    assert str(proj.version) == "6.6.6"
     assert proj.name == "Cibo Matto"
     assert proj.author == "Sugar Water"
     assert proj.author_email == "SugarWate@cibomatto.com"
+    assert proj.authors == [{'email': 'SugarWate@cibomatto.com', 'name': 'Sugar Water'}]
     assert proj.description == "Test data for regarding tests"
     # FIXME: Not yet supported
     #assert proj.long_description == "TEST DATA FOR REGARDING TESTS"

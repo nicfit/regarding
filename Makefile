@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 .DEFAULT_GOAL := build
 
 ## User settings
@@ -5,6 +6,9 @@ PYTEST_ARGS ?= ./tests
 PYPI_REPO ?= pypi
 
 ## Config
+# FIXME: want to set name and version with only pne call to pdm
+#FOO := $(shell read -r PROJECT_NAME VERSION  <<<$(pdm show --name --version | xargs))
+#$(warning $(FOO))
 PROJECT_NAME := $(shell pdm show --name 2> /dev/null)
 ifeq ($(strip $(PROJECT_NAME)),)
   $(error "PROJECT_NAME not set")
@@ -50,7 +54,7 @@ build: install ## Build the project
 
 install:  ## Install the project
 	@echo "$(HEADER_COLOR)Installing $(PROJECT_NAME) $(VERSION)...$(NO_COLOR)"
-	pdm install
+	pip install .
 
 #
 #setup.py: pyproject.toml poetry.lock
@@ -63,28 +67,59 @@ $(ABOUT_PY): pyproject.toml
 
 ## Clean
 clean: clean-test clean-dist  ## Clean the project
-	rm -rf build
+	rm -rf build dist
 	find -type d -name __pycache__ | xargs -r rm -rf
 	rm -rf regarding.egg-info
+	touch pyproject.toml
 
 
 ## Test
-#test:  ## Run tests with default python
-#	tox -e py -- $(PYTEST_ARGS)
+test:  ## Run tests with default python
+	tox -e py -- $(PYTEST_ARGS)
 
-#test-all:  ## Run tests with all supported versions of Python
-#	tox --parallel=all -- $(PYTEST_ARGS)
+test-all:  ## Run tests with all supported versions of Python
+	tox --parallel=all -- $(PYTEST_ARGS)
+
+coverage:
+	tox -e coverage
+
+coverage-view:
+	@if [ ! -f build/tests/coverage/index.html ]; then \
+		${MAKE} coverage; \
+	fi
+	@${BROWSER} build/tests/coverage/index.html
 
 
-#coverage:
-#	tox -e coverage
-#
-#coverage-view:
-#	@if [ ! -f build/tests/coverage/index.html ]; then \
-#		${MAKE} coverage; \
-#	fi
-#	@${BROWSER} build/tests/coverage/index.html
-#
+
+lint:  ## Check coding style
+	tox -e lint
+
+clean-test:  ## Clean test artifacts (included in `clean`)
+	rm -rf .tox .coverage
+	rm -rf tests/__pycache__ .pytest_cache
+
+
+## Distribute
+sdist:
+	pdm build --no-wheel -d dist --no-clean
+
+bdist:
+	pdm build --no-sdist -d dist --no-clean
+
+.PHONY: dist
+dist: all sdist bdist check-manifest  ## Create source and binary distribution files
+	@# The cd dist keeps the dist/ prefix out of the md5sum files
+	@cd dist && \
+	for f in $$(ls); do \
+		md5sum $${f} > $${f}.md5; \
+	done
+	@ls -l dist
+
+clean-dist:  ## Clean distribution artifacts (included in `clean`)
+	rm -rf dist
+	find . -type f -name '*~' | xargs -r rm
+	rm -rf .venv .pdm-build
+
 #test-dist: dist
 #	poetry check
 #	@for f in `find dist -type f -name ${PROJECT_NAME}-${VERSION}.tar.gz \
@@ -92,36 +127,8 @@ clean: clean-test clean-dist  ## Clean the project
 #		twine check $$f ; \
 #	done
 
-#lint:  ## Check coding style
-#	tox -e lint
-#
-clean-test:  ## Clean test artifacts (included in `clean`)
-	rm -rf .tox
-	rm -rf tests/__pycache__ .pytest_cache
-
-
-## Distribute
-#sdist: build
-#	poetry build --format sdist
-#
-#bdist: build
-#	poetry build --format wheel
-
-#.PHONY: dist
-#dist: clean sdist bdist  ## Create source and binary distribution files
-#	@# The cd dist keeps the dist/ prefix out of the md5sum files
-#	@cd dist && \
-#	for f in $$(ls); do \
-#		md5sum $${f} > $${f}.md5; \
-#	done
-#	@ls dist
-#
-clean-dist:  ## Clean distribution artifacts (included in `clean`)
-	rm -rf dist
-	find . -type f -name '*~' | xargs -r rm
-#
-#check-manifest:
-#	check-manifest
+check-manifest:
+	check-manifest
 #
 #_check-version-tag:
 #	@if git tag -l | grep -E '^$(shell echo ${RELEASE_TAG} | sed 's|\.|.|g')$$' > /dev/null; then \
@@ -136,19 +143,12 @@ clean-dist:  ## Clean distribution artifacts (included in `clean`)
 #	poetry publish -r ${PYPI_REPO}
 #
 #
-### Install
-#install:   ## Install project and dependencies
-#	poetry install
-#
-#install-dev:   ## Install project, dependencies, and developer tools
-#	poetry install --with=dev
-
 
 ## Release
 #release: pre-release _freeze-release test-all dist _tag-release _pypi-release
 #
 #pre-release: clean-autogen build install-dev info _check-version-tag clean \
-#             test test-dist check-manifest authors changelog
+#             test test-dist authors changelog
 #	@git status -s -b
 #
 #BUMP ?= prerelease
@@ -175,3 +175,16 @@ clean-dist:  ## Clean distribution artifacts (included in `clean`)
 #
 #changelog:
 #	@echo "FIXME: changelog target not yet implemented"
+
+VENV_NAME ?= dev-regarding
+VENV_DIR ?= $(HOME)/.virtualenvs
+VENV_ACTIVATE := $(VENV_DIR)/$(VENV_NAME)/bin/activate
+devenv-clean:
+	test -n "$(VENV_DIR)" && test -n "$(VENV_NAME)" && rm -r $(VENV_DIR)/$(VENV_NAME)
+
+devenv:
+	python -m venv --upgrade-deps $(VENV_DIR)/$(VENV_NAME)
+	source $(VENV_ACTIVATE) && pip install --editable .[dev]
+	@printf "\n$(BOLD_COLOR)To activate the virtualenv:$(NO_COLOR) source $(VENV_ACTIVATE)\n"
+	@printf "$(BOLD_COLOR)To deactivate the virtualenv:$(NO_COLOR) deactivate\n\n"
+

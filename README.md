@@ -1,3 +1,3 @@
 # regarding
 
-Create `__about__.py` files for Python project metadata.
+Create `__about__.py` files from Python pyproject.toml metadata.

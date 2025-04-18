@@ -1,55 +1,41 @@
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.regarding]
+years = "2020,2025"
+release_name = "hijt"
+
+[tool.pdm]
+distribution = true
 
 [project]
 name = "regarding"
-version = "0.3.0"
+version = "0.2.0-dev"
 description = "Create __about__.py files for Python project metadata."
 authors = [
-    {name = "Travis Shirk",email = "travis@pobox.com"},
+    {name = "Travis Shirk", email = "travis@pobox.com"},
 ]
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
 dependencies = [
-    "toml",
-    "packaging",
+    "toml>=0.10.2",
+    "packaging>=24.2",
 ]
 
 [project.urls]
 homepage = "https://github.com/nicfit/regarding"
-#
-#[tool.poetry.scripts]
-#regarding = "regarding.__main__:main"
-#
-#[tool.poetry]
-#include = [
-#    "AUTHORS", "Makefile", "tox.ini", "poetry.lock", "requirements.txt",
-#    "tests/*.py"
-#]
-#
-#[tool.poetry.group.dev]
-#optional = true
-#
-#[tool.poetry.group.dev.dependencies]
-#pytest = "^8.3.4"
-#dephell = "^0.8.3"
-#tox = "^4.24.1"
-#twine = "^6.1.0"
-#check-manifest = "^0.50"
-#flake8 = "^7.1.2"
+repository = "https://github.com/nicfit/regarding"
 
-[tool.regarding]
-years = "2020,2025"
-release_name = ""
+[project.scripts]
+regarding = "regarding.__main__:main"
 
-#[tool.poetry.requires-plugins]
-#poetry-plugin-export = ">=1.8"
-
-#[tool.dephell]
-#[tool.dephell.main]
-#from = {format = "poetry", path = "pyproject.toml"}
-#to = {format = "setuppy", path = "setup.py"}
-[tool.pdm]
-distribution = true
+[project.optional-dependencies]
+dev = [
+    "check-manifest>=0.50",
+    "pytest>=8.3.5",
+    "tox>=4.25.0",
+    "twine>=6.1.0",
+    "flake8>=7.2.0",
+]

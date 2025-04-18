@@ -28,7 +28,7 @@ def _main(args: argparse.Namespace):
     project = args.project_meta
     about_py = ABOUT_TEMPLATE.format(**locals())
 
-    args.out_file.write(f"{about_py}\n")
+    args.out_file.write(f"{about_py}")
     args.out_file.close()
 
 
