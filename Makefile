@@ -9,11 +9,11 @@ PYPI_REPO ?= pypi
 # FIXME: want to set name and version with only pne call to pdm
 #FOO := $(shell read -r PROJECT_NAME VERSION  <<<$(pdm show --name --version | xargs))
 #$(warning $(FOO))
-PROJECT_NAME := $(shell python setup.py --name 2> /dev/null)
+PROJECT_NAME := $(shell sed -n "s/^name = \"\(.*\)\"/\1/p" pyproject.toml)
 ifeq ($(strip $(PROJECT_NAME)),)
   $(error "PROJECT_NAME not set")
 endif
-VERSION := $(shell python setup.py --version 2> /dev/null)
+VERSION := $(shell sed -n "s/^version = \"\(.*\)\"/\1/p" pyproject.toml)
 ifeq ($(strip $(VERSION)),)
   $(error "VERSION not set")
 endif
