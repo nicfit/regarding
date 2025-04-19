@@ -22,13 +22,13 @@ class Version:
 
 
 project_name = "regarding"
-version = "0.2.0.dev0"
+version = "0.2.0"
 version_info = Version(
     0, 2, 0,
-    0,
     None,
     None,
-    "hijt",
+    None,
+    "Pain Reaper",
 )
 
 author = "Travis Shirk"
