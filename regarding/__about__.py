@@ -43,5 +43,5 @@ def versionBanner() -> str:
     if version:
         v = version
         if version_info is not None and version_info.release_name:
-            v = "XXX %s (%s)" % (v, version_info.release_name)
+            v = "%s (%s)" % (v, version_info.release_name)
     return v

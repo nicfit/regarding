@@ -9,11 +9,11 @@ PYPI_REPO ?= pypi
 # FIXME: want to set name and version with only pne call to pdm
 #FOO := $(shell read -r PROJECT_NAME VERSION  <<<$(pdm show --name --version | xargs))
 #$(warning $(FOO))
-PROJECT_NAME := $(shell pdm show --name 2> /dev/null)
+PROJECT_NAME := $(shell python setup.py --name 2> /dev/null)
 ifeq ($(strip $(PROJECT_NAME)),)
   $(error "PROJECT_NAME not set")
 endif
-VERSION := $(shell pdm show --version 2> /dev/null)
+VERSION := $(shell python setup.py --version 2> /dev/null)
 ifeq ($(strip $(VERSION)),)
   $(error "VERSION not set")
 endif
@@ -49,7 +49,7 @@ help:  ## List all commands
 .PHONY: build
 build: install ## Build the project
 	@echo "$(HEADER_COLOR)Building $(PROJECT_NAME) $(VERSION)...$(NO_COLOR)"
-	pdm build
+	pdm build -d build
 	$(MAKE) $(ABOUT_PY)
 
 install:  ## Install the project
@@ -184,7 +184,7 @@ devenv-clean:
 
 devenv:
 	python -m venv --upgrade-deps $(VENV_DIR)/$(VENV_NAME)
-	source $(VENV_ACTIVATE) && pip install --editable .[dev]
+	source $(VENV_ACTIVATE) && python -m pip install --editable .[dev]
 	@printf "\n$(BOLD_COLOR)To activate the virtualenv:$(NO_COLOR) source $(VENV_ACTIVATE)\n"
 	@printf "$(BOLD_COLOR)To deactivate the virtualenv:$(NO_COLOR) deactivate\n\n"
 

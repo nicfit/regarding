@@ -16,7 +16,7 @@ description = "Create __about__.py files for Python project metadata."
 authors = [
     {name = "Travis Shirk", email = "travis@pobox.com"},
 ]
-license = {text = "MIT"}
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
 dependencies = [
