@@ -12,34 +12,17 @@ class RegardingProjectPath:
 
 
 @pytest.fixture()
-def setup_py_project_path(tmp_path):
-    setup_py = tmp_path / "setup.py"
-    setup_py.write_text(textwrap.dedent("""
-    import setuptools
-    setuptools.setup(
-        name="Cibo Matto",
-        version="6.6.6",
-        author="Sugar Water",
-        author_email="SugarWate@cibomatto.com",
-        description="Test data for regarding tests",
-        long_description="TEST DATA FOR REGARDING TESTS",
-        url="https://github.com/nicfit/regarding",
-    ) 
-    """))
-
-    return RegardingProjectPath(tmp_path, setup_py)
-
-
-@pytest.fixture()
 def pyproject_toml_project_path(tmp_path):
     pyproject_toml = tmp_path / "pyproject.toml"
     pyproject_toml.write_text(textwrap.dedent("""
-    [tool.poetry]
+    [project]
     name="Cibo Matto"
     version = "6.6.6"
-    authors = ["Sugar Water <SugarWate@cibomatto.com>"]
-    homepage = "https://github.com/nicfit/regarding"
+    authors = [{name = "Sugar Water", email = "SugarWate@cibomatto.com"}]
     description = "Test data for regarding tests"
+    
+    [project.urls]
+    homepage = "https://github.com/nicfit/regarding"
     """))
 
     return RegardingProjectPath(tmp_path, pyproject_toml)

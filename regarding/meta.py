@@ -1,51 +1,27 @@
 import toml
 from pathlib import Path
-from subprocess import run
-from collections import namedtuple
-from configparser import ConfigParser
+from packaging import version
 
 
 class ProjectMeta:
     meta_file = None
 
     # Universal
-    _name = None
-    _version, _version_info = None, None
-    _description = None
-    _author, _author_email = None, None
-    _homepage = None
+    _name: str = None
+    _version: version.Version = None
+    _description: str = None
+    _author: str = None
+    _author_email: str = None
+    _homepage: str = None
 
     # Extensions
-    _release_name = None
-    _years = None
+    _release_name: str = None
+    _years: str = None
 
     @staticmethod
-    def parseVersion(v):
-        from packaging import version
-        #from packaging.version import parse as parse_version
-
+    def parseVersion(v: str) -> version.Version:
         # Some validation and normalization (e.g. 1.0-a1 -> 1.0a1)
-        parsed_v = version.parse(v)
-
-        if parsed_v.is_devrelease or parsed_v.is_prerelease or  parsed_v.is_postrelease:
-            rel = parsed_v.public.split(".")[-1]
-        else:
-            rel = "final"
-
-        # Although parsed the following components are not captured: post, dev, local, epoch
-        Version = namedtuple("Version",
-                             "major, minor, maint, release, dev, pre, post")
-        ver_info = Version(
-            major=parsed_v.release[0],
-            minor=parsed_v.release[1] if len(parsed_v.release) > 1 else 0,
-            maint=parsed_v.release[2] if len(parsed_v.release) > 2 else 0,
-            release=rel,
-            dev=parsed_v.dev,
-            pre=parsed_v.pre,
-            post=parsed_v.post,
-        )
-        return parsed_v.public, ver_info
-
+        return version.parse(v)
 
     @property
     def name(self):
@@ -64,12 +40,8 @@ class ProjectMeta:
         return self._author_email
 
     @property
-    def version(self):
+    def version(self) -> version.Version:
         return self._version
-
-    @property
-    def version_info(self):
-        return self._version_info
 
     @property
     def homepage(self):
@@ -85,66 +57,37 @@ class ProjectMeta:
 
 
 class ProjectToml(ProjectMeta):
-    """Poetry meta data"""
+    """pyproject meta data"""
     meta_file = "pyproject.toml"
 
     def __init__(self):
         project_toml = toml.loads(Path(self.meta_file).read_text())
-        self._poetry = project_toml["project"]
+        self._pyproject = project_toml["project"]
 
-        self._name = self._poetry["name"]
-        self._version, self._version_info = self.parseVersion(self._poetry["version"])
-        self._description = self._poetry["description"]
-        self._homepage = self._poetry.get("homepage", "")
+        self._name = self._pyproject["name"]
+        self._version = self.parseVersion(self._pyproject["version"])
+        self._description = self._pyproject["description"]
 
-        author = self._poetry["authors"][0]
+        urls = self._pyproject.get("urls", None)
+        if urls:
+            self._homepage = urls.get("homepage", None)
+
+        author = self._pyproject["authors"][0]
         self._author = author["name"]
         self._author_email = author["email"]
 
-        regarding = project_toml["tool"].get("regarding", {})
-        self._release_name = regarding.get("release_name", None)
-        self._years = regarding.get("years", None)
+        if "tool" in project_toml:
+            regarding = project_toml["tool"].get("regarding", {})
+            self._release_name = regarding.get("release_name", None)
+            self._years = regarding.get("years", None)
 
     @property
     def authors(self):
-        return self._poetry["authors"]
-
-
-class SetupPy(ProjectMeta):
-    """Setup.py meta data"""
-    meta_file = "setup.py"
-
-    def __init__(self):
-        self._setup_py = Path(self.meta_file)
-        if not self._setup_py.exists():
-            raise FileNotFoundError(f"File not found: {self.meta_file}")
-
-        # XXX: yes, a setuptools loaded setup.py faster, and should be used if available
-        self._name = self._run("--name")
-        self._version, self._version_info = self.parseVersion(self._run("--version"))
-        self._description = self._run("--description")
-        self._homepage = self._run("--url")
-        self._author = self._run("--author")
-        self._author_email = self._run("--author-email")
-
-        setup_cfg = Path("setup.cfg")
-        if setup_cfg.exists():
-            section = "tool:regarding"
-
-            cfg = ConfigParser()
-            cfg.read(str(setup_cfg))
-            if cfg.has_section(section):
-                self._release_name = cfg.get(section, "release_name", fallback=None)
-                self._years = cfg.get(section, "years", fallback=None)
-
-    def _run(self, option):
-        proc = run(f"python {self._setup_py} {option}",
-                   capture_output=True, check=True, shell=True, encoding="utf8")
-        return proc.stdout.strip()
+        return self._pyproject["authors"]
 
 
 def load() -> ProjectMeta:
-    all_meta_types = (ProjectToml, SetupPy)
+    all_meta_types = (ProjectToml,)
 
     for MetaType in all_meta_types:
         try:

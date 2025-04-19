@@ -28,16 +28,20 @@ def _main(args: argparse.Namespace):
     project = args.project_meta
     about_py = ABOUT_TEMPLATE.format(**locals())
 
-    args.out_file.write(f"{about_py}\n")
+    args.out_file.write(f"{about_py}")
     args.out_file.close()
 
 
 def main(args: Sequence[str] = None):
-    des = __about__.description if __about__ and hasattr(__about__, "description") else None
-    ver = __about__.version if __about__ and hasattr(__about__, "version") else None
+    desc, version = "", ""
+    if __about__:
+        from .__about__ import description, versionBanner
+        desc = description
+        version = versionBanner()
 
-    cli = argparse.ArgumentParser(prog="regarding", description=des)
-    cli.add_argument("--version", action="version", version=f"%(prog)s {ver}")
+    cli = argparse.ArgumentParser(prog="regarding", description=desc)
+    cli.add_argument("--version", action="version",
+                     version=f"%(prog)s {version}")
     cli.add_argument("-o", "--out-file",
                      type=argparse.FileType("w", encoding='UTF-8'), default="-",
                      help="The output file, by default is file is printed to standard out.")
