@@ -39,6 +39,7 @@ years = "{project.years}"
 description = "{project.description}"
 homepage = "{project.homepage}"
 
+
 def versionBanner() -> str:
     \"\"\"Return the version string including release name.\"\"\"
     v = ""

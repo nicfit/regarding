@@ -37,6 +37,7 @@ years = "2020,2025"
 description = "Create __about__.py files for Python project metadata."
 homepage = "https://github.com/nicfit/regarding"
 
+
 def versionBanner() -> str:
     """Return the version string including release name."""
     v = ""

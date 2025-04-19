@@ -41,7 +41,7 @@ def test_module_version():
 
     status, stdout, _ = regardingMain(["--version"])
     assert status == 0
-    assert stdout.getvalue() == f"{project_name} {version}\n"
+    assert stdout.getvalue() == f"{project_name} {version} ({version_info.release_name})\n"
 
 
 def test_module_all():

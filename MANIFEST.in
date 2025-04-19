@@ -1,3 +1,4 @@
+include setup.py
 include *.lock
 include AUTHORS
 include Makefile

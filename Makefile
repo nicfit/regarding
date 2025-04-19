@@ -138,14 +138,17 @@ check-manifest:
 #
 #authors:
 #	dephell generate authors
-#
-#_pypi-release:
-#	poetry publish -r ${PYPI_REPO}
-#
-#
+
+_pypi-release:
+	pdm publish --skip-existing --no-build --dest=dist --repository=${PYPI_REPO}
+
 
 ## Release
 #release: pre-release _freeze-release test-all dist _tag-release _pypi-release
+releaseXXX: dist
+	rm dist/*.md5
+	$(MAKE) _pypi-release
+
 #
 #pre-release: clean-autogen build install-dev info _check-version-tag clean \
 #             test test-dist authors changelog
