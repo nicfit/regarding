@@ -36,3 +36,12 @@ author_email = "travis@pobox.com"
 years = "2020,2025"
 description = "Create __about__.py files for Python project metadata."
 homepage = "https://github.com/nicfit/regarding"
+
+def versionBanner() -> str:
+    """Return the version string including release name."""
+    v = ""
+    if version:
+        v = version
+        if version_info is not None and version_info.release_name:
+            v = "XXX %s (%s)" % (v, version_info.release_name)
+    return v

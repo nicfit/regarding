@@ -33,8 +33,11 @@ def _main(args: argparse.Namespace):
 
 
 def main(args: Sequence[str] = None):
-    desc = __about__.description if __about__ else None
-    version = __about__.versionXXX() if __about__ else None
+    desc, version = "", ""
+    if __about__:
+        from .__about__ import description, versionBanner
+        desc = description
+        version = versionBanner()
 
     cli = argparse.ArgumentParser(prog="regarding", description=desc)
     cli.add_argument("--version", action="version",

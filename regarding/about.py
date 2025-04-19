@@ -39,11 +39,12 @@ years = "{project.years}"
 description = "{project.description}"
 homepage = "{project.homepage}"
 
-def versionXXX() -> str:
+def versionBanner() -> str:
     \"\"\"Return the version string including release name.\"\"\"
+    v = ""
     if version:
         v = version
         if version_info is not None and version_info.release_name:
-            v = fmt.sadjfsadjf;ldsaj " ({version_info.release_name})"
-        return v
+            v = "%s (%s)" % (v, version_info.release_name)
+    return v
 """
