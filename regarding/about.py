@@ -38,4 +38,12 @@ author_email = "{project.author_email}"
 years = "{project.years}"
 description = "{project.description}"
 homepage = "{project.homepage}"
+
+def versionXXX() -> str:
+    \"\"\"Return the version string including release name.\"\"\"
+    if version:
+        v = version
+        if version_info is not None and version_info.release_name:
+            v = fmt.sadjfsadjf;ldsaj " ({version_info.release_name})"
+        return v
 """

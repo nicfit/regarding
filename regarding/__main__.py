@@ -33,11 +33,12 @@ def _main(args: argparse.Namespace):
 
 
 def main(args: Sequence[str] = None):
-    des = __about__.description if __about__ and hasattr(__about__, "description") else None
-    ver = __about__.version if __about__ and hasattr(__about__, "version") else None
+    desc = __about__.description if __about__ else None
+    version = __about__.versionXXX() if __about__ else None
 
-    cli = argparse.ArgumentParser(prog="regarding", description=des)
-    cli.add_argument("--version", action="version", version=f"%(prog)s {ver}")
+    cli = argparse.ArgumentParser(prog="regarding", description=desc)
+    cli.add_argument("--version", action="version",
+                     version=f"%(prog)s {version}")
     cli.add_argument("-o", "--out-file",
                      type=argparse.FileType("w", encoding='UTF-8'), default="-",
                      help="The output file, by default is file is printed to standard out.")
